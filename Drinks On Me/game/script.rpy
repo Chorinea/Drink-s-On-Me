@@ -22,7 +22,7 @@ define ingredients = ["Vodka", "Whiskey", "Bourbon", "Blue Curacao", "Sake", "Am
 # doppelganger likes/dislikes initially -1 as a placeholder
 define char_preferences = [
     [0, 10, 20], 
-    [1, 11, 21] 
+    [1, 11, 21], 
     [2, 12, 22], 
     [3, 13, 23], 
     [4, 14, 24], 
