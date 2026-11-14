@@ -14,8 +14,30 @@ define f = Character("Fairy")
 define m = Character("Medusa")
 define d = Character("Doppelganger")
 
+define ingredients = ["Vodka", "Whiskey", "Bourbon", "Blue Curacao", "Sake", "Amaretto", "Wine", "Gin", "Tequila", "Brandy", 
+"Tomato", "Wormwood", "Powdered Green Dust", "Plastic", "Blue Raspberry Swirl", "Milk", "Glitter", "Simple Syrup", "Generic Energy Drink", "Grenadine", 
+"Garlic", "Silver Spoon", "Unbranded and Totally Non-Descript Peanut Butter and Chocolate Pieces", "Cinnamon", "Salt", "Lemon", "Mirror", "Sage", "Blood", "Mint"]
+
+# preferred ingredients of each character
+# doppelganger likes/dislikes initially -1 as a placeholder
+define char_preferences = [
+    [0, 10, 20], 
+    [1, 11, 21] 
+    [2, 12, 22], 
+    [3, 13, 23], 
+    [4, 14, 24], 
+    [5, 15, 25], 
+    [6, 16, 26], 
+    [-1, -1, -1]
+]
+
+# defines where liked ingredient pos is of each character in char_preferences
+# doppelganger is initially -1
+define likes_pos = [0, 0, 2, 2, 0, 1, 1, -1]
+
 define cur_char = -1
-define lives_count = 3
+define lives_count = 3      # if 0, game over state
+define drink_result = -1   # 0-5 for dialogue branching, 3 is win state
 
 # array pos matches char_select path branching
 define sus_array = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -26,7 +48,27 @@ transform size_close:
     ysize 800
     fit "contain"
 
+# plays sip and glass clink sound TO-DO
+# label sip_sfx:
+
 # !!! sep python section for drink mixing minigame !!!
+
+# serve drink occurs dialogue notes PLACEHOLDER TEXT
+# all neutral --> "whole drink is forgettable"
+# 1 like, 0 dislikes --> "i like it, but its not memorable enough"
+# 1 like, 1 dislike --> point out neutral ingredient "...is quite boring"
+# 1 like, 2 dislikes --> "this seems goo- what have you done?" crashes out --> character drink made --> they don't show up again good job!
+# 1 dislike, 2 neutrals --> "both forgettable and mildy disgusting..."
+# 2 dislikes, 1 neutral --> "this doesnt look good at all..." will not even drink it
+
+# sets drink result var to be 0-5 based on num of like/dislike/neutrals (3 is win state), sets neutral ingredient name if applicable
+# drink score -> +2 for like, +1 per dislike -> score == 3 win state
+# pop out ingredients in drink array if found -> any leftover items are neutral
+# init python:
+#     def drink_match_var_setting(drink_array, character_pref_array):
+
+
+
 
 label char_select:
     define random_char = renpy.random.choice(char_choice_array)
@@ -54,14 +96,6 @@ label char_select:
         call doppelganger_path
 
     return
-
-# serve drink occurs dialogue notes PLACEHOLDER TEXT
-# all neutral --> "whole drink is forgettable"
-# 1 like, 0 dislikes --> "i like it, but its not memorable enough"
-# 1 like, 1 dislike --> point out neutral ingredient "...is quite boring"
-# 1 like, 2 dislikes --> "this seems goo- what have you done?" crashes out --> character drink made --> they don't show up again good job!
-# 1 dislike, 2 neutrals --> point out ONLY the first neutral ingredient "...is quite boring"
-# 2 dislikes, 1 neutral --> "this doesnt look good at all..." will not even drink it
 
 # dialogue path of vampire
 label vampire_path:
