@@ -37,7 +37,7 @@ define likes_pos = [0, 0, 2, 2, 0, 1, 1, -1]
 
 define cur_char = -1
 define lives_count = 3      # if 0, game over state
-define drink_result = -1;   # 0-5 for dialogue branching, 3 is win state
+define drink_result = -1   # 0-5 for dialogue branching, 3 is win state
 
 # array pos matches char_select path branching
 define sus_array = [0, 0, 0, 0, 0, 0, 0, 0]
