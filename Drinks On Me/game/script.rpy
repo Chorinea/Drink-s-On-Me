@@ -27,10 +27,23 @@ label start:
     v "Hi I like drinking things."
 
     v "Things that are. not blood."
-    
+
+    "I'm feeling especially human today y'know?"
+
+    "something about being a bartender I guess..."
+
     show vampunhappy
     
     v "Ew I dislike humans."
-    # This ends the game.
 
-    return
+$chv_sus = 0
+
+menu:
+    "Aren't you a human?":
+        v "Of course, what kind of question is that!"
+        $ chv_sus -= 1
+    "Me too man, me too":
+        v "I like you... you have good sense."
+        $ chv_sus += 1
+
+return
