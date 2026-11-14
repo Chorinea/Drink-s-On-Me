@@ -3,7 +3,7 @@
 # Declare characters used by this game. The color argument colorizes the
 # name of the character.
 
-define e = Character("Eileen")
+define v = Character("customer")
 
 
 # The game starts here.
@@ -20,14 +20,17 @@ label start:
     # replace it by adding a file named "eileen happy.png" to the images
     # directory.
 
-    show eileen happy
+    show vamphappy
 
     # These display lines of dialogue.
 
-    e "You've created a new Ren'Py game."
+    v "Hi I like drinking things."
 
-    e "Once you add a story, pictures, and music, you can release it to the world!"
-
+    v "Things that are. not blood."
+    
+    show vampunhappy
+    
+    v "Ew I dislike humans."
     # This ends the game.
 
     return
