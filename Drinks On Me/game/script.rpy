@@ -5,6 +5,7 @@
 # TO-DO: SWAP PLACEHOLDER CRYPTID NAMES WITH CHARACTER NAMES!!!
 # to-do: add character name colors based on char design
 
+define b = Character("Bartender")
 define v = Character("Vampire")
 define w = Character("Werewolf")
 define a = Character("Alien")
@@ -13,6 +14,14 @@ define g = Character("Ghost")
 define f = Character("Fairy")
 define m = Character("Medusa")
 define d = Character("Doppelganger")
+image doppel neutral = "images/Doppelganger/doppelganger_neutral.png"
+image doppel neutral talk = "images/Doppelganger/doppelganger_neutral_open.png"
+image doppel happy = "images/Doppelganger/doppelganger_happy.png"
+image doppel happy talk = "images/Doppelganger/doppelganger_happy_open.png"
+image doppel angry = "images/Doppelganger/doppelganger_angry.png"
+image doppel angry talk = "images/Doppelganger/doppelganger_angry_open.png"
+image doppel shocked = "images/Doppelganger/doppelganger_shocked.png"
+image doppel true form = "images/Doppelganger/doppelganger_true_form.png"
 
 define ingredients = ["Vodka", "Whiskey", "Bourbon", "Blue Curacao", "Sake", "Amaretto", "Wine", "Gin", "Tequila", "Brandy", 
 "Tomato", "Wormwood", "Powdered Green Dust", "Plastic", "Blue Raspberry Swirl", "Milk", "Glitter", "Simple Syrup", "Generic Energy Drink", "Grenadine", 
@@ -46,7 +55,7 @@ default neutral_ingredient = -1      # for drink dialogue
 # array pos matches char_select path branching
 default sus_array = [0, 0, 0, 0, 0, 0, 0, 0]
 default has_visited = [False, False, False, False, False, False, False, False]
-define char_choice_array = [0, 1, 2, 3, 4, 5, 6, 7]
+default char_choice_array = [0, 1, 2, 3, 4, 5, 6, 7]
 
 transform size_close:
     ysize 800
@@ -56,6 +65,9 @@ transform size_close:
 # label sip_sfx:
 
 # !!! sep python section for drink mixing minigame !!!
+label make_drink:
+    "We making drinks now!"
+    return
 
 # sets drink result var to be 0-5 based on num of like/dislike/neutrals (3 is win state), sets neutral ingredient name if applicable
 # pop out ingredients in drink array if found -> any leftover items are neutral
@@ -114,7 +126,7 @@ init python:
 
 
 label char_select:
-    define random_char = renpy.random.choice(char_choice_array)
+    $ random_char = renpy.random.choice(char_choice_array)
 
     while random_char == cur_char:
         $ random_char = renpy.random.choice(char_choice_array)     # reroll random char if same as cur
@@ -143,56 +155,140 @@ label char_select:
 # dialogue path of vampire
 label vampire_path:
     $ drink_result = 0      # initialize drink result
-    show vamp unhappy
-    v "1" 
+    show doppel neutral
+    v "1"
 
     if has_visited[0] == True:
-        v "We've seen each other before..."
+        if sus_array[0] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
         # logic for decreasing sus by 1 upon revisiting
         if sus_array[0] != 0:
-            v "...you can ask me another question."
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
             $ sus_array[0] -= 1
 
-    # TO-DO: GIVE OPTION TO GO TO NOTEBOOK/TALK/MIX DRINK
-    # TO-DO: IMPLEMENT BRANCHING DIALOGUE FOR ASKING QUESTIONS SECTION
-    # make sure to break out of dialogue if sus == 3
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[0] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[0] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[0] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[0] += 1
+            if sus_array[0] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
 
     # after serve drink
-    
-    define test_drink = [10, 2, 0]
-    $ served_drink = test_drink
-    $ set_drink_result_variables(served_drink, correct_drink[0], 0)
 
-# serve drink occurs dialogue notes PLACEHOLDER TEXT
-# 0: all neutral --> "whole drink is forgettable"
-# 1: 1 like, 0 dislikes --> "i like it, but its not memorable enough"
-# 2: 1 like, 1 dislike --> point out neutral ingredient "... is quite boring"
-# 3: 1 like, 2 dislikes --> "this seems goo- what have you done?" crashes out --> character drink made --> they don't show up again good job!
-# 4: 1 dislike, 2 neutrals --> "both forgettable and mildy disgusting..."
-# 5: 2 dislikes, 1 neutral --> "this doesnt look good at all..." will not even drink it
+    label .after_drink:
+        show doppel neutral
+        $ test_drink = [10, 20, 0]
+        $ served_drink = test_drink
+        $ set_drink_result_variables(served_drink, correct_drink[0], 0)
 
-    # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
-    # drink result dialogue
-    if drink_result == 3:
-        v "this seems goo- what have you done?"
-        $ char_choice_array.remove(0)
-    else:
-        if drink_result == 0:
-            v "whole drink is forgettable"
-        elif drink_result == 1:
-            v "i like it, but its not memorable enough"
-        elif drink_result == 2:
-            v "[ingredients[neutral_ingredient]]... is quite boring"
-        elif drink_result == 4:
-            v "both forgettable and mildy disgusting..."
+    # serve drink occurs dialogue notes PLACEHOLDER TEXT
+    # 0: all neutral --> "whole drink is forgettable"
+    # 1: 1 like, 0 dislikes --> "i like it, but its not memorable enough"
+    # 2: 1 like, 1 dislike --> point out neutral ingredient "... is quite boring"
+    # 3: 1 like, 2 dislikes --> "this seems goo- what have you done?" crashes out --> character drink made --> they don't show up again good job!
+    # 4: 1 dislike, 2 neutrals --> "both forgettable and mildy disgusting..."
+    # 5: 2 dislikes, 1 neutral --> "this doesnt look good at all..." will not even drink it
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(0)
         else:
-            v "this doesnt look good at all..."
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
 
-        $ has_visited[0] = True
-        $ lives_count -= 1
+            $ has_visited[0] = True
+            $ lives_count -= 1
 
-    # parting goodbye lines
+        # parting goodbye lines
+        v "Goodbye."
+
+        hide doppel
 
     return  
 
@@ -325,10 +421,6 @@ label start:
     # images directory to show it.
 
     scene bg room
-    #start the bg music
-    play music "relaxing-jazz-music-loop.mp3"
-
-    call vampire_path
 
     # calls character until no chars remain or you lost all your lives
     while char_choice_array and lives_count != 0:
