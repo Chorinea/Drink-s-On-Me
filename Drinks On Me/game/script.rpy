@@ -421,6 +421,8 @@ label start:
     # images directory to show it.
 
     scene bg room
+    #start the bg music
+    play music "relaxing-jazz-music-loop.mp3"
 
     # calls character until no chars remain or you lost all your lives
     while char_choice_array and lives_count != 0:
