@@ -566,7 +566,11 @@ screen about():
                 text "[gui.about!t]\n"
 
             text _("Made with {a=https://www.renpy.org/}Ren'Py{/a} [renpy.version_only].\n\n[renpy.license!t]")
-
+            text _("\n{b}{color=#cc0000}Game Credits{/b}{/color}")
+            text _("\nMusic: Relaxing Jazz Music (loop) by{a=https://freesound.org/people/Migfus20/sounds/723287/} Migfus20 {/a}")
+            text _("Developers: Ponkipoki, Duncan Hintz, Chorinea, Pinkabee")
+            text _("Artists: Pinkabee, REDACTED_kneecaps, Ponkipoki, Chorinea")
+            text _("Images:")
 
 style about_label is gui_label
 style about_label_text is gui_label_text
