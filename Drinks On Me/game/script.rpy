@@ -10,7 +10,7 @@ define v = Character("Victor")
 image vampire neutral = "images/Vampire/vampire_neutralclosed1.png"
 image vampire happy = "images/Vampire/vampire_happyclosed.png"
 image vampire angry = "images/Vampire/vampire_angryopen.png"
-define w = Character("Werewolf")
+define w = Character("Jakob")
 image werewolf neutral = "images/Werewolf/werewolf_neutral.png"
 image werewolf happy = "images/Werewolf/werewolf_happy.png"
 image werewolf angry = "images/Werewolf/werewolf_angry.png"
@@ -29,7 +29,7 @@ image fairy neutral = "images/Fairy/fairy_neutral.png"
 image fairy happy = "images/Fairy/fairy_happy.png"
 image fairy angry = "images/Fairy/fairy_angry.png"
 define m = Character("Medusa")
-define d = Character("Doppelganger")
+define d = Character("Yoru Nanami")
 image doppel neutral = "images/Doppelganger/doppelganger_neutral.png"
 image doppel neutral talk = "images/Doppelganger/doppelganger_neutral_open.png"
 image doppel happy = "images/Doppelganger/doppelganger_happy.png"
@@ -689,7 +689,7 @@ label selkie_path:
     label .ask_questions:
         if sus_array[3] >= 3:
             show selkie angry
-            s "I do not want to talk anymore."
+            s "“Um. I don’t mean to be rude but. Since this is a bar and all… Can you just like, make me a drink now?"
             return
 
         s "Ask away."
@@ -697,15 +697,48 @@ label selkie_path:
         label .questions:
             if sus_array[3] < 3:
                 menu:
-                    "Why are you so beautiful?":
-                        show selkie happy
-                        s "thank you"
-                        jump .questions     # let player ask more questions after branch end
-
-                    "Are you evil?":
-                        show selkie angry
-                        s "bro wtf"
+                    "Nice sweater!":
                         call .add_sus
+                        show selkie neutral
+                        s "Thank you! People always say I-I mean it, is wife material haha."
+                        s "..."
+                        b "..."
+                        s "Like...as a joke..."
+                        s "Because it's so... warm?"
+                        s "Um."
+                        s "This is a bar. Can I get my drink soon?"
+                    "Do you have a flavor profile in mind?":
+                        show selkie neutral
+                        s "Hmmm... I like warm flavors, and beachy vibes."
+                        s "Like a cosy book you can't put down."
+                        s "Spices are hard to come by, so I also really enjoy those."
+                    "Do you have a favorite color?":
+                        s "Easy. Blue."
+                        s "It just feels like home..."
+                    "Any flavors I should avoid?":
+                        call .add_sus
+                        show selkie angry
+                        s "Um... I don't like man-made artifical stuff I guess?"
+                        b "...?"
+                        s "Oh, that sounds strange! I just mean uh,"
+                        show selkie neutral
+                        s "Anything is fine! I don't have a preference!"
+                        b "I see..."
+                    "Read any good books lately?":
+                        show selkie happy
+                        s "Yes! I just came from the library actually."
+                        s "I love romantasy! I just can't get enough of it."
+                        s "Though I will say... having the female lead be the monster is shocklingly difficult to find."
+                        s "I'm really into Kiera Cass' stuff, even if it's a bit older."
+                        s "*squints* and not... 100% the same, just close..."
+                        s "Ah, sorry, I'm talking too much huh."
+                    "How was the traffic today":
+                        show selkie angry
+                        s "Oh um, I couldn't tell you. I walked."
+                        s "I don't come into the city super often, mostly just to visit the library."
+                        s "Books are so cool... it sucks that they have to be kept somewhere dry- I mean um. That they take up so much space!"
+
+                        jump .questions     # let player ask more questions after branch end      
 
                         menu:
                             "Yah cuz your face just looks evil":
@@ -748,7 +781,7 @@ label selkie_path:
         if drink_result == 3:
             show selkie shocked
             s "this seems goo- what have you done?"
-            show selkie true from
+            show selkie true form
             s "NOOOOOOOOO"
             call fade_scene
             $ char_choice_array.remove(3)
@@ -933,23 +966,7 @@ label fairy_path:
         menu:
             "Talk":
                 call .ask_questions
-                menu:
-                    "What do you prefer in a drink?":
-                        show fairy happy
-                        v "MILKKKKKKKKKK MILK MILK MILK"
-                        jump .questions
-                    
-                    "Any dislikes?":
-                        show fairy neutral
-                        v "nothing SOUR BLEGH"
 
-                        menu:
-                            "Anything else?":
-                                v "NOTHING with nuts, im allergic!!!!"
-                                jump .questions
-
-                            "Nevermind, I'm done asking questions.":
-                                return 
                 if sus_array[5] < 3:
                     jump .decision
                 else: 
@@ -971,7 +988,7 @@ label fairy_path:
     label .ask_questions:
         if sus_array[5] >= 3:
             show fairy angry
-            f "I do not want to talk anymore."
+            f "DONT talk to me."
             return
 
         v "Ask away."
@@ -979,6 +996,23 @@ label fairy_path:
         label .questions:
             if sus_array[5] < 3:
                 menu:
+                    "What do you prefer in a drink?":
+                        show fairy happy
+                        v "MILKKKKKKKKKK MILK MILK MILK"
+                        jump .questions
+                    
+                    "Any dislikes?":
+                        show fairy neutral
+                        v "nothing SOUR BLEGH"
+
+                        menu:
+                            "Anything else?":
+                                v "NOTHING with nuts, im allergic!!!!"
+                                jump .questions
+
+                            "Nevermind, I'm done asking questions.":
+                                return   
+
                     "Why are you so beautiful?":
                         show fairy happy
                         f "thank you"
@@ -1028,7 +1062,7 @@ label fairy_path:
         # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
         # drink result dialogue
         if drink_result == 3:
-            show fairy shocked
+            show fairy angry
             f "this seems goo- what have you done?"
 
             call fade_scene
@@ -1355,28 +1389,37 @@ label doppelganger_path:
         "You hand the drink to the guest."
         $ set_drink_result_variables(served_drink, correct_drink[7], 7)
 
+        show doppel happy
+        d "Hmm~~~~ Anything you make it delicious~"
+        "They take a sip from the drink."
+        d "...Quite a funny taste."
+        show doppel true form
+        d "...I know what you're trying to do..."
+        d "...Please, do with me what you have planned. I would love to see how this unfolds."
+        call fade_scene
+        $ char_choice_array.remove(7)
         # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
         # drink result dialogue
-        if drink_result == 3:
-            v "this seems goo- what have you done?"
-            $ char_choice_array.remove(7)
-        else:
-            if drink_result == 0:
-                v "whole drink is forgettable"
-            elif drink_result == 1:
-                v "i like it, but its not memorable enough"
-            elif drink_result == 2:
-                v "[ingredients[neutral_ingredient]]... is quite boring"
-            elif drink_result == 4:
-                v "both forgettable and mildy disgusting..."
-            else:
-                v "this doesnt look good at all..."
+        # if drink_result == 3:
+        #     v "this seems goo- what have you done?"
+        #     $ char_choice_array.remove(7)
+        # else:
+        #     if drink_result == 0:
+        #         v "whole drink is forgettable"
+        #     elif drink_result == 1:
+        #         v "i like it, but its not memorable enough"
+        #     elif drink_result == 2:
+        #         v "[ingredients[neutral_ingredient]]... is quite boring"
+        #     elif drink_result == 4:
+        #         v "both forgettable and mildy disgusting..."
+        #     else:
+        #         v "this doesnt look good at all..."
 
-            $ has_visited[7] = True
-            $ lives_count -= 1
+        #     $ has_visited[7] = True
+        #     $ lives_count -= 1
 
             # parting goodbye lines
-            v "Goodbye."
+            # v "Goodbye."
 
         hide doppel
 
@@ -1394,8 +1437,6 @@ label start:
     scene bg room
     #start the bg music
     play music "relaxing-jazz-music-loop.mp3"
-
-    call doppelganger_path
 
     # calls character until no chars remain or you lost all your lives
     while char_choice_array and lives_count != 0:
