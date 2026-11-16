@@ -24,7 +24,7 @@ image doppel shocked = "images/Doppelganger/doppelganger_shocked.png"
 image doppel true form = "images/Doppelganger/doppelganger_true_form.png"
 
 define ingredients = ["Vodka", "Whiskey", "Bourbon", "Blue Curacao", "Sake", "Amaretto", "Wine", "Gin", "Tequila", "Brandy", 
-"Tomato", "Wormwood", "Powdered Green Dust", "Plastic", "Blue Raspberry Swirl", "Milk", "Glitter", "Simple Syrup", "Generic Energy Drink", "Grenadine", 
+"Tomato", "Monkshood", "Powdered Green Dust", "Plastic", "Blue Raspberry Swirl", "Milk", "Glitter", "Simple Syrup", "Generic Energy Drink", "Grenadine", 
 "Garlic", "Silver Spoon", "Unbranded and Totally Non-Descript Peanut Butter and Chocolate Pieces", "Cinnamon", "Salt", "Lemon", "Mirror", "Sage", "Blood", "Mint"]
 
 # preferred ingredients of each character
@@ -47,7 +47,7 @@ define likes_pos = [0, 0, 2, 2, 0, 1, 1, -1]
 default cur_char = -1
 default lives_count = 3      # if 0, game over state
 
-default served_drink = [-1, -1, -1]     # edited after clicking "serve" in mixing minigame
+default served_drink = []     # edited after clicking "serve" in mixing minigame
 
 default drink_result = 0   # 0-5 for dialogue branching, 3 is win state
 default neutral_ingredient = -1      # for drink dialogue
@@ -64,10 +64,6 @@ transform size_close:
 # plays sip and glass clink sound TO-DO
 # label sip_sfx:
 
-# !!! sep python section for drink mixing minigame !!!
-label make_drink:
-    "We making drinks now!"
-    return
 
 # sets drink result var to be 0-5 based on num of like/dislike/neutrals (3 is win state), sets neutral ingredient name if applicable
 # pop out ingredients in drink array if found -> any leftover items are neutral
@@ -196,6 +192,7 @@ label vampire_path:
                     "No":
                         jump .decision
 
+    # EDIT CHARACTER QUESTIONS
     # where you ask questions
     label .ask_questions:
         if sus_array[0] >= 3:
@@ -253,8 +250,7 @@ label vampire_path:
 
     label .after_drink:
         show doppel neutral
-        $ test_drink = [10, 20, 0]
-        $ served_drink = test_drink
+        "You hand the drink to the guest."
         $ set_drink_result_variables(served_drink, correct_drink[0], 0)
 
     # serve drink occurs dialogue notes PLACEHOLDER TEXT
@@ -285,8 +281,8 @@ label vampire_path:
             $ has_visited[0] = True
             $ lives_count -= 1
 
-        # parting goodbye lines
-        v "Goodbye."
+            # parting goodbye lines
+            v "Goodbye."
 
         hide doppel
 
@@ -295,17 +291,132 @@ label vampire_path:
 # dialogue path of werewolf
 label werewolf_path:
     $ drink_result = 0      # initialize drink result
-    show vamp unhappy
+    show doppel neutral
     v "2"  
 
-    # if right --> TO-DO: ADD IF STATEMENT FOR CHECKING CORRECTNESS
-    v "this seems goo- what have you done?"
-    $ char_choice_array.remove(1)
+    if has_visited[1] == True:
+        if sus_array[1] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
-    # else wrong --> branching dialogue notes on drink
-    $ has_visited[1] = True
-    $ lives_count -= 1
-    # parting goodbye lines
+        # logic for decreasing sus by 1 upon revisiting
+        if sus_array[1] != 0:
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
+            $ sus_array[1] -= 1
+
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[1] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # EDIT CHARACTER QUESTIONS
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[1] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[1] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[1] += 1
+            if sus_array[1] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
+
+    # after serve drink
+
+    label .after_drink:
+        show doppel neutral
+        "You hand the drink to the guest."
+        $ set_drink_result_variables(served_drink, correct_drink[1], 1)
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(1)
+        else:
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
+
+            $ has_visited[1] = True
+            $ lives_count -= 1
+
+            # parting goodbye lines
+            v "Goodbye."
+
+        hide doppel
 
     return 
 
@@ -315,14 +426,129 @@ label alien_path:
     show vamp unhappy
     v "3" 
 
-    # if right --> TO-DO: ADD IF STATEMENT FOR CHECKING CORRECTNESS
-    v "this seems goo- what have you done?"
-    $ char_choice_array.remove(2)
+    if has_visited[2] == True:
+        if sus_array[2] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
-    # else wrong --> branching dialogue notes on drink
-    $ has_visited[2] = True
-    $ lives_count -= 1
-    # parting goodbye lines
+        # logic for decreasing sus by 1 upon revisiting
+        if sus_array[2] != 0:
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
+            $ sus_array[2] -= 1
+
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[2] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # EDIT CHARACTER QUESTIONS
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[2] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[2] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[2] += 1
+            if sus_array[2] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
+
+    # after serve drink
+
+    label .after_drink:
+        show doppel neutral
+        "You hand the drink to the guest."
+        $ set_drink_result_variables(served_drink, correct_drink[2], 2)
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(2)
+        else:
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
+
+            $ has_visited[2] = True
+            $ lives_count -= 1
+
+            # parting goodbye lines
+            v "Goodbye."
+
+        hide doppel
 
     return
 
@@ -332,14 +558,129 @@ label selkie_path:
     show vamp unhappy
     v "4" 
 
-    # if right --> TO-DO: ADD IF STATEMENT FOR CHECKING CORRECTNESS
-    v "this seems goo- what have you done?"
-    $ char_choice_array.remove(3)
+    if has_visited[3] == True:
+        if sus_array[3] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
-    # else wrong --> branching dialogue notes on drink
-    $ has_visited[3] = True
-    $ lives_count -= 1
-    # parting goodbye lines
+        # logic for decreasing sus by 1 upon revisiting
+        if sus_array[3] != 0:
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
+            $ sus_array[3] -= 1
+
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[3] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # EDIT CHARACTER QUESTIONS
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[3] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[3] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[3] += 1
+            if sus_array[3] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
+
+    # after serve drink
+
+    label .after_drink:
+        show doppel neutral
+        "You hand the drink to the guest."
+        $ set_drink_result_variables(served_drink, correct_drink[3], 3)
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(3)
+        else:
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
+
+            $ has_visited[3] = True
+            $ lives_count -= 1
+
+            # parting goodbye lines
+            v "Goodbye."
+
+        hide doppel
 
     return  
 
@@ -349,14 +690,129 @@ label ghost_path:
     show vamp unhappy
     v "5"  
 
-    # if right --> TO-DO: ADD IF STATEMENT FOR CHECKING CORRECTNESS
-    v "this seems goo- what have you done?"
-    $ char_choice_array.remove(4)
+    if has_visited[4] == True:
+        if sus_array[4] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
-    # else wrong --> branching dialogue notes on drink
-    $ has_visited[4] = True
-    $ lives_count -= 1
-    # parting goodbye lines
+        # logic for decreasing sus by 1 upon revisiting
+        if sus_array[4] != 0:
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
+            $ sus_array[4] -= 1
+
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[4] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # EDIT CHARACTER QUESTIONS
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[4] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[4] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[4] += 1
+            if sus_array[4] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
+
+    # after serve drink
+
+    label .after_drink:
+        show doppel neutral
+        "You hand the drink to the guest."
+        $ set_drink_result_variables(served_drink, correct_drink[4], 4)
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(4)
+        else:
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
+
+            $ has_visited[4] = True
+            $ lives_count -= 1
+
+            # parting goodbye lines
+            v "Goodbye."
+
+        hide doppel
 
     return
 
@@ -366,14 +822,129 @@ label fairy_path:
     show vamp unhappy
     v "6"  
 
-    # if right --> TO-DO: ADD IF STATEMENT FOR CHECKING CORRECTNESS
-    v "this seems goo- what have you done?"
-    $ char_choice_array.remove(5)
+    if has_visited[5] == True:
+        if sus_array[5] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
-    # else wrong --> branching dialogue notes on drink
-    $ has_visited[5] = True
-    $ lives_count -= 1
-    # parting goodbye lines
+        # logic for decreasing sus by 1 upon revisiting
+        if sus_array[5] != 0:
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
+            $ sus_array[5] -= 1
+
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[5] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # EDIT CHARACTER QUESTIONS
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[5] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[5] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[5] += 1
+            if sus_array[5] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
+
+    # after serve drink
+
+    label .after_drink:
+        show doppel neutral
+        "You hand the drink to the guest."
+        $ set_drink_result_variables(served_drink, correct_drink[5], 5)
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(5)
+        else:
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
+
+            $ has_visited[5] = True
+            $ lives_count -= 1
+
+            # parting goodbye lines
+            v "Goodbye."
+
+        hide doppel
 
     return 
 
@@ -383,14 +954,129 @@ label medusa_path:
     show vamp unhappy
     v "7"
 
-    # if right --> TO-DO: ADD IF STATEMENT FOR CHECKING CORRECTNESS
-    v "this seems goo- what have you done?"
-    $ char_choice_array.remove(6)
+    if has_visited[6] == True:
+        if sus_array[6] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
-    # else wrong --> branching dialogue notes on drink
-    $ has_visited[6] = True
-    $ lives_count -= 1
-    # parting goodbye lines
+        # logic for decreasing sus by 1 upon revisiting
+        if sus_array[6] != 0:
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
+            $ sus_array[6] -= 1
+
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[6] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # EDIT CHARACTER QUESTIONS
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[6] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[6] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[6] += 1
+            if sus_array[6] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
+
+    # after serve drink
+
+    label .after_drink:
+        show doppel neutral
+        "You hand the drink to the guest."
+        $ set_drink_result_variables(served_drink, correct_drink[6], 6)
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(6)
+        else:
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
+
+            $ has_visited[6] = True
+            $ lives_count -= 1
+
+            # parting goodbye lines
+            v "Goodbye."
+
+        hide doppel
 
     return
 
@@ -400,14 +1086,129 @@ label doppelganger_path:
     show vamp unhappy
     v "8"
 
-    # if right --> TO-DO: ADD IF STATEMENT FOR CHECKING CORRECTNESS
-    v "this seems goo- what have you done?"
-    $ char_choice_array.remove(7)
+    if has_visited[7] == True:
+        if sus_array[7] == 0:
+            show doppel happy talk
+            v "Hey, we've seen each other before!"
+        else:
+            show doppel neutral talk
+            v "We've seen each other before..."
 
-    # else wrong --> branching dialogue notes on drink
-    $ has_visited[7] = True
-    $ lives_count -= 1
-    # parting goodbye lines
+        # logic for decreasing sus by 1 upon revisiting
+        if sus_array[7] != 0:
+            v "...I might be open to talk a little again."
+            show doppel neutral
+            "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
+            $ sus_array[7] -= 1
+
+    # talk or make drink choice
+    label .decision:
+        "What would you like to do?"
+        menu:
+            "Talk":
+                call .ask_questions
+
+                if sus_array[7] < 3:
+                    jump .decision
+                else: 
+                    "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
+                    call make_drink
+                    jump .after_drink
+
+            "Mix Drink":
+                "Are you sure you'd like to mix the drink now? You cannot go back to talk to the guest after this."
+                menu:
+                    "Yes":
+                        call make_drink
+                        jump .after_drink
+                    "No":
+                        jump .decision
+
+    # EDIT CHARACTER QUESTIONS
+    # where you ask questions
+    label .ask_questions:
+        if sus_array[7] >= 3:
+            show doppel angry talk
+            v "I do not want to talk anymore."
+            return
+
+        v "Ask away."
+
+        label .questions:
+            if sus_array[7] < 3:
+                menu:
+                    "Why are you so beautiful?":
+                        show doppel happy talk
+                        v "thank you"
+                        show doppel happy
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Are you evil?":
+                        show doppel angry talk
+                        v "bro wtf"
+                        show doppel angry
+                        call .add_sus
+
+                        menu:
+                            "Yah cuz your face just looks evil":
+                                v ">:("
+                                call .add_sus
+
+                                menu:
+                                    "...are you a vampire":
+                                        v "..."
+                                        call .add_sus
+                                    "Nevermind, I'm done asking questions.":
+                                        return
+                                    
+                            "Nevermind, I'm done asking questions.":
+                                return    
+
+                    "Nevermind, I'm done asking questions.":
+                        return                                    
+            return
+
+        # helper function for halting questions if max sus reached
+        label .add_sus():
+            $ sus_array[7] += 1
+            if sus_array[7] >= 3:
+                $ renpy.pop_call()
+                return
+            return
+
+        return
+
+    # after serve drink
+
+    label .after_drink:
+        show doppel neutral
+        "You hand the drink to the guest."
+        $ set_drink_result_variables(served_drink, correct_drink[7], 7)
+
+        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # drink result dialogue
+        if drink_result == 3:
+            v "this seems goo- what have you done?"
+            $ char_choice_array.remove(7)
+        else:
+            if drink_result == 0:
+                v "whole drink is forgettable"
+            elif drink_result == 1:
+                v "i like it, but its not memorable enough"
+            elif drink_result == 2:
+                v "[ingredients[neutral_ingredient]]... is quite boring"
+            elif drink_result == 4:
+                v "both forgettable and mildy disgusting..."
+            else:
+                v "this doesnt look good at all..."
+
+            $ has_visited[7] = True
+            $ lives_count -= 1
+
+            # parting goodbye lines
+            v "Goodbye."
+
+        hide doppel
 
     return
 
@@ -424,6 +1225,8 @@ label start:
     #start the bg music
     play music "relaxing-jazz-music-loop.mp3"
 
+
+
     # calls character until no chars remain or you lost all your lives
     while char_choice_array and lives_count != 0:
         call char_select 
@@ -434,55 +1237,5 @@ label start:
     else:
         "Everyone died nahhhhh" # TO-DO: IMPLEMENT WIN STATE     
 
-    # This shows a character sprite. A placeholder is used, but you can
-    # replace it by adding a file named "eileen happy.png" to the images
-    # directory.
-
-    show vamp happy
-
-    # These display lines of dialogue.
-
-    v "Hi I like drinking things."
-
-    v "Things that are. not blood."
-
-    "I'm feeling especially human today y'know?"
-
-    "something about being a bartender I guess..."
-
-    show vamp unhappy
-    
-    v "Ew I dislike humans."
-
-
-
-$chv_sus = 0
-
-menu:
-    "Aren't you a human?":
-        v "Of course, what kind of question is that!"
-        $ chv_sus += 2
-    "Me too man, me too":
-        show vamp happy
-        v "I like you... you have good sense."
-
-
-label stats:
-    "The customer's suspicion of you is at [chv_sus]. The less suspicious they are, the longer you can talk to them."
-
-show vamp happy at left, size_close
-
-v "I'm here for a human drink. Got any reccomendations? It's been a while since I've been outside."
-
-menu:
-    "Actually, I'd like to ask some questions to get your tastes.":
-        v "This would lead into a menu of questions with different effects on suspicion. If I had the time."
-
-    "Yes, I'll make you a bloody mary!":
-        show vamp unhappy
-        v "Bleh I'm gonna die because you put garlic in it"
-
-    "Yes, I'll make you a strawberry daiquiri!":
-        v "Wow way too sweet. I'm never coming back here."
 
 return
