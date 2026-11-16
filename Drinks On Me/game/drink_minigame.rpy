@@ -8,27 +8,26 @@ image ing_6_img = "images/Ingredients/Bases/wine_.png"
 image ing_7_img = "images/Ingredients/Bases/gin_.png"
 image ing_8_img = "images/Ingredients/Bases/tequila_.png"
 image ing_9_img = "images/Ingredients/Bases/brandy_.png"
-image ing_10_img = "images/Ingredients/Bases/tomato_.png"
-image ing_11_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_11_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_12_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_13_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_14_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_15_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_16_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_17_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_18_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_19_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_20_img = Solid("#173c54", xsize=160, ysize=200)
-image ing_21_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_22_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_23_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_24_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_25_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_26_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_27_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_28_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_29_img = Solid("#aaddff", xsize=160, ysize=200) 
+image ing_10_img = "images/Ingredients/Mixers/tomatosoup_.png"
+image ing_11_img = "images/Ingredients/Mixers/wormwood_.png"
+image ing_12_img = "images/Ingredients/Mixers/greenPowder_.png"
+image ing_13_img = "images/Ingredients/Mixers/plastic_.png"
+image ing_14_img = "images/Ingredients/Mixers/blueRasberrySwirl_.png"
+image ing_15_img = "images/Ingredients/Mixers/milk_.png"
+image ing_16_img = "images/Ingredients/Mixers/glitter_.png"
+image ing_17_img = "images/Ingredients/Mixers/SimpleSyrup_.png"
+image ing_18_img = "images/Ingredients/Mixers/genericEnergyDrink_.png"
+image ing_19_img = "images/Ingredients/Mixers/grenadine_.png"
+image ing_20_img = "images/Ingredients/Toppers/garlic_.png"
+image ing_21_img = "images/Ingredients/Toppers/silverspoon_.png"
+image ing_22_img = "images/Ingredients/Toppers/UnbrandedandTotallyNon-DescriptPeanutButterandChocolatePieces_.png"
+image ing_23_img = "images/Ingredients/Toppers/cinnamon_.png"
+image ing_24_img = "images/Ingredients/Toppers/salt_.png"
+image ing_25_img = "images/Ingredients/Toppers/lemon_.png"
+image ing_26_img = "images/Ingredients/Toppers/mirror_.png"
+image ing_27_img = "images/Ingredients/Toppers/sage_.png"
+image ing_28_img = "images/Ingredients/Toppers/blood_.png"
+image ing_29_img = "images/Ingredients/Toppers/mint_.png"
 
 default selected_ingredients = []
     
