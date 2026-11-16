@@ -182,18 +182,19 @@ label char_select:
 label vampire_path:
     $ drink_result = 0      # initialize drink result
     show vampire neutral
-    "A suave and distinguished gentleman walks through the front door. He seems a bit pale."
+    v "I'll be trying this bar. Don't disappoint me."
 
     if has_visited[0] == True:
         if sus_array[0] == 0:
             show vampire happy
-            v "...I came back, but rest assured, it is not because of you! ...I quite enjoy the atmosphere here, is all."
+            v "Surprise! Your favorite customer is back. I expect something impressive..."
         else:
             show vampire neutral
-            v "...Hmm, I suppose I felt that I should give this place another shot. Nothing more."
+            v "Yes I'm back, try to make something less disgusting this time."
 
         # logic for decreasing sus by 1 upon revisiting
         if sus_array[0] != 0:
+            show vampire angry
             v "...I might be open to talk a little again."
             show vampire neutral
             "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
@@ -209,6 +210,8 @@ label vampire_path:
                 if sus_array[0] < 3:
                     jump .decision
                 else: 
+                    show vampire angry
+                    v "Enough of this. Your questions bore me. Make me my drink, drink maker."
                     "It looks like the guest is no longer up for conversation anymore. Let's make them that drink then."
                     call make_drink
                     jump .after_drink
@@ -227,7 +230,7 @@ label vampire_path:
     label .ask_questions:
         if sus_array[0] >= 3:
             show vampire angry
-            v "Cease making conversation with me."
+            v "Enough of this. Your questions bore me. Make me my drink, drink maker."
             return
 
         v "Hm, ask away then."
@@ -235,51 +238,63 @@ label vampire_path:
         label .questions:
             if sus_array[0] < 3:
                 menu:
-                    "What do you prefer in a drink?":
+                    "Anything specific you want?":
                         show vampire happy
-                        v "Something strong, but keep it more refined."
+                        v "It needs to be red."
+                        show vampire angry
+                        v "I won't drink it if it's not red."
                         jump .questions
                     
-                    "Any dislikes?":
+                    "You seem fidgety...":
                         show vampire neutral
-                        v "I hate the smell of italian restaurants the most."
-
-                        menu:
-                            "Anything else?":
-                                v "I wouldn't really call myself a vegan. Best believe I only desire the most ...\"authentic\" sources."
-                                jump .questions
-
-                            "Nevermind, I'm done asking questions.":
-                                return 
-
-                    "Why are you so beautiful?":
+                        v "Well, I could use a cigarette."
                         show vampire happy
-                        v "thank you"
+                        v "It helps control the cravings."
+                        b "You can't smoke in here."
+                        show vampire angry
+                        v "Since when??"
+                        v "Ugh, whatever. Just get me my drink."
+                        call .add_sus
+                        jump .questions
+
+
+                    "What's with the cloak?":
+                        show vampire happy
+                        v "Cloaks are an excellent way to stay dry. Much better than awful modern textiles."
+                        show vampire neutral
+                        v "You would do well to switch to one yourself."
+                        show vampire happy
+                        v "If you could afford it."
+                        call .add_sus
                         jump .questions     # let player ask more questions after branch end
 
-                    "Are you evil?":
-                        show vampire angry
-                        v "bro wtf"
+                    "What kinds of drinks do you like?":
+                        show vampire happy
+                        v "Classic, don't do anything crazy or modern."
+                        show vampire happy
+                        v "I'm also fond of alchohol made with a potato base."
+                        v "They're stored underground, how comforting..."
+                        show vampire neutral
+                        v "Oh, and you can leave off the garnish, nothing with a wooden skewer."
+                        jump .questions
+
+                    "Do you play a lot of rpgs? You kinda remind me of a character...":
+                        show vampire neutral
+                        v "Video games... All technology is obnoxious."
+                        show vampire happy
+                        v "Why anyone would want to play a game on them is beyond me."
                         call .add_sus
+                        jump .questions
 
-                        menu:
-                            "Yah cuz your face just looks evil":
-                                v ">:("
-                                call .add_sus
-
-                                menu:
-                                    "...are you a vampire":
-                                        v "..."
-                                        call .add_sus
-                                    "Nevermind, I'm done asking questions.":
-                                        return
-                                    
-                            "Nevermind, I'm done asking questions.":
-                                return    
-
+                    "What is your least favorite flavor?":
+                        show vampire neutral
+                        v "Italian food."
+                        show vampire angry
+                        v "Just walking by a restaurant is stomach turning... ugh."
+                        jump .questions
+                    
                     "Nevermind, I'm done asking questions.":
-                        return                                    
-            return
+                        return    
 
         # helper function for halting questions if max sus reached
         label .add_sus():
@@ -294,7 +309,7 @@ label vampire_path:
     # after serve drink
 
     label .after_drink:
-        show vampire neutral
+        show vampire happy
         "You hand the drink to the guest."
         $ set_drink_result_variables(served_drink, correct_drink[0], 0)
 
@@ -321,30 +336,35 @@ label vampire_path:
             if drink_result == 0:
                 show vampire neutral
                 "Victor takes a sip."
-                v "...incredible. This is a mind-numbingly boring taste. Truly remarkable skills you have, bartender."
-            elif drink_result == 1:
-                "Victor takes a sip."
+                v "hm. I didn’t know it was possible to make something so… inoffensive. Like drinking nothing at all. "
                 show vampire happy
-                v "Hmm, I like it, but it's just not memorable enough..."
-
-            elif drink_result == 2:
-                "Victor takes a sip."                
+                v "Maybe try harder next time, I like to be dazzled, not bored."
+            elif drink_result == 1:
                 show vampire neutral
+                "Victor takes a sip."
+                v "Not bad, not bad at all. It has some positive qualities… but it’s not memorable enough."
+                show vampire happy
+                v "I think it needs a little more of a kick."
+            elif drink_result == 2:
+                show vampire neutral
+                "Victor takes a sip."
                 v "[ingredients[neutral_ingredient]]... is quite boring."
+                v "Maybe actually try to make the whole drink appealing next time."
             elif drink_result == 4:
-                "Victor takes a sip."                
+                "Victor takes a sip."
                 show vampire angry
-                v "This is both forgettable and mildy disgusting... Please refrain from serving me this again."
+                v "both forgettable and mildy disgusting... I don’t know how you managed that, given how nosy you seem."
+                v "Try harder next time. I won’t even bother drinking this."
             else:
                 show vampire angry
-                v "this doesnt look good at all..."
-                "Looks like he didn't want to drink it at all. Try to add something he would like to mask the drink."
+                v "Wow. Wow. How incredibly unappealing. Did you happen to spit in my drink as well? If you wanted me to leave, just say so."
+                "Looks like he didn't want to drink it at all. Try to add something he would like to mask the drink."                
 
             $ has_visited[0] = True
             $ lives_count -= 1
 
             # parting goodbye lines
-            v "Hmph, this establishment is quite disappointing. Best believe I will not step into this establishment postforth."
+            v "Hmph, this establishment is quite subpar. I hope to see improvement soon."
 
         hide vampire
 
@@ -399,10 +419,10 @@ label werewolf_path:
     label .ask_questions:
         if sus_array[1] >= 3:
             show werewolf angry
-            w "I do not want to talk anymore."
+            w "...Not up to chatting right now."
             return
 
-        w "Ask away."
+        w "Well then, ask away."
 
         label .questions:
             if sus_array[1] < 3:
@@ -467,34 +487,39 @@ label werewolf_path:
     label .after_drink:
         show werewolf neutral
         "You hand the drink to the guest."
-        $ set_drink_result_variables(served_drink, correct_drink[1], 1)
+        w "...Thanks of the drink."
+        $ set_drink_result_variables(served_drink, correct_drink[1], 1)           
 
         # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
         # drink result dialogue
         if drink_result == 3:
-            show werewolf neutral            
-            w "...Thanks of the drink."
+            "Jakob takes a sip."
             show werewolf shocked
-            w "What in the-?! This is nasty!!"
-            w "Ugh... it hurts..."
+            w "What in the-?! This is nasty!"
+            w "Ugh... it... hurts..."
             show werewolf true form
-            w "You... What do you even want from me?"
+            w "You... What... are you even planning?"
             call fade_scene
             $ char_choice_array.remove(1)
         else:
             if drink_result == 0:
                 "Jakob takes a sip."
+                show werewolf neutral
                 w "Wow, man. This... tastes like nothing."
             elif drink_result == 1:
-                "Jakob takes a sip."                
+                "Jakob takes a sip."        
+                show werewolf happy        
                 w "There's somethin in there I really like, but everything else ain't that striking."
             elif drink_result == 2:
                 "Jakob takes a sip."
+                show werewolf neutral
                 w "[ingredients[neutral_ingredient]]... is quite boring."
             elif drink_result == 4:
                 "Jakob takes a sip."
-                w "Wow, man. This... tastes like nothing. But with a hint of yuck. Can't describe it in any other way, champ."
+                show werewolf angry
+                w "Wow. This... tastes like nothing. But with a hint of yuck. Can't describe it in any other way, champ."
             else:
+                show werewolf angry
                 w "...This does not look right. Sorry kid, but I can't drink this."
                 "Looks like he didn't want to drink it at all. Try to add something he would like to mask the drink."
 
@@ -567,7 +592,7 @@ label alien_path:
                 menu:
                     "Why are you so beautiful?":
                         show doppel happy talk
-                        w "thank you"
+                        v "thank you"
                         show doppel happy
                         jump .questions     # let player ask more questions after branch end
 
@@ -689,7 +714,7 @@ label selkie_path:
     label .ask_questions:
         if sus_array[3] >= 3:
             show selkie angry
-            s "“Um. I don’t mean to be rude but. Since this is a bar and all… Can you just like, make me a drink now?"
+            s "Um. I don’t mean to be rude but. Since this is a bar and all… Can you just like, make me a drink now?"
             return
 
         s "Ask away."
@@ -698,25 +723,34 @@ label selkie_path:
             if sus_array[3] < 3:
                 menu:
                     "Nice sweater!":
-                        call .add_sus
-                        show selkie neutral
+                        show selkie happy
                         s "Thank you! People always say I-I mean it, is wife material haha."
+                        show selkie neutral
                         s "..."
                         b "..."
+                        show selkie angry
                         s "Like...as a joke..."
                         s "Because it's so... warm?"
-                        s "Um."
-                        s "This is a bar. Can I get my drink soon?"
-                    "Do you have a flavor profile in mind?":
                         show selkie neutral
+                        s "Um."
+                        show selkie angry
+                        s "This is a bar. Can I get my drink soon?"
+                        call .add_sus
+                        jump .questions     # let player ask more questions after branch end   
+                    "Do you have a flavor profile in mind?":
+                        show selkie happy
                         s "Hmmm... I like warm flavors, and beachy vibes."
                         s "Like a cosy book you can't put down."
+                        show selkie neutral
                         s "Spices are hard to come by, so I also really enjoy those."
+                        jump .questions     # let player ask more questions after branch end   
                     "Do you have a favorite color?":
+                        show selkie happy
                         s "Easy. Blue."
+                        show selkie angry
                         s "It just feels like home..."
+                        jump .questions     # let player ask more questions after branch end   
                     "Any flavors I should avoid?":
-                        call .add_sus
                         show selkie angry
                         s "Um... I don't like man-made artifical stuff I guess?"
                         b "...?"
@@ -724,36 +758,28 @@ label selkie_path:
                         show selkie neutral
                         s "Anything is fine! I don't have a preference!"
                         b "I see..."
+                        call .add_sus
+                        jump .questions     # let player ask more questions after branch end   
                     "Read any good books lately?":
                         show selkie happy
                         s "Yes! I just came from the library actually."
                         s "I love romantasy! I just can't get enough of it."
+                        show selkie angry
                         s "Though I will say... having the female lead be the monster is shocklingly difficult to find."
                         s "I'm really into Kiera Cass' stuff, even if it's a bit older."
-                        s "*squints* and not... 100% the same, just close..."
+                        s "and not... 100 percent the same, just close..."
+                        show selkie neutral
                         s "Ah, sorry, I'm talking too much huh."
+                        jump .questions     # let player ask more questions after branch end   
                     "How was the traffic today":
                         show selkie angry
                         s "Oh um, I couldn't tell you. I walked."
+                        show selkie neutral
                         s "I don't come into the city super often, mostly just to visit the library."
+                        show selkie happy
                         s "Books are so cool... it sucks that they have to be kept somewhere dry- I mean um. That they take up so much space!"
-
+                        call .add_sus
                         jump .questions     # let player ask more questions after branch end      
-
-                        menu:
-                            "Yah cuz your face just looks evil":
-                                s ">:("
-                                call .add_sus
-
-                                menu:
-                                    "...are you a vampire":
-                                        s "..."
-                                        call .add_sus
-                                    "Nevermind, I'm done asking questions.":
-                                        return
-                                    
-                            "Nevermind, I'm done asking questions.":
-                                return    
 
                     "Nevermind, I'm done asking questions.":
                         return                                    
@@ -774,34 +800,55 @@ label selkie_path:
     label .after_drink:
         show selkie neutral
         "You hand the drink to the guest."
+        s "Thank you..."
         $ set_drink_result_variables(served_drink, correct_drink[3], 3)
 
         # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
         # drink result dialogue
         if drink_result == 3:
+            "Shelly takes a sip."
             show selkie shocked
             s "this seems goo- what have you done?"
             show selkie true form
             s "NOOOOOOOOO"
-            call fade_scene
             $ char_choice_array.remove(3)
+            call fade_scene
         else:
             if drink_result == 0:
-                s "whole drink is forgettable"
+                "Shelly takes a sip."
+                show selkie angry
+                s "I could’ve just had water and I’d feel less bored."
+                show selkie shocked
+                s "Wait did I say that outloud?? Sorry, I just uh, maybe try making something different next time?"
+                s "bye!!"
             elif drink_result == 1:
-                s "i like it, but its not memorable enough"
+                "Shelly takes a sip."
+                show selkie happy
+                s "Oh, that’s pretty nice. Good job!"
+                show selkie angry
+                s "Though maybe for next time... It could be a bit cosier?"
             elif drink_result == 2:
-                s "[ingredients[neutral_ingredient]]... is quite boring"
+                "Shelly takes a sip."
+                show selkie angry
+                s "Huh. I like the start, but the finish is uh… bleh"
+                s "Sorry, I'm sure you tried your best!"
             elif drink_result == 4:
-                s "both forgettable and mildy disgusting..."
+                "Shelly takes a sip."
+                show selkie angry
+                s "Mm- mildy nasty... and boring at the same time?"
+                show selkie neutral
+                s "I don't know how you managed it!"
             else:
-                s "this doesnt look good at all..."
+                show selkie angry
+                s "...This looks… really nasty…"
+                s "I’m not going to drink that…"
+                "Looks like she didn't want to drink it at all. Try to add something she would like to mask the drink."
 
             $ has_visited[3] = True
             $ lives_count -= 1
 
             # parting goodbye lines
-            s "Goodbye."
+            s "It's just not as good as I thought it would be. I will take my leave now..."
 
         hide selkie
 
@@ -943,7 +990,9 @@ label ghost_path:
 label fairy_path:
     $ drink_result = 0      # initialize drink result
     show fairy neutral
-    f "Hi, I'm Ebony Dark'ness Dementia Raven Way!!!!!"  
+    f "Hi, I'm Ebony Dark'ness Dementia Raven Way!!!!!"
+    show fairy happy
+    f "Just kidding!... Or am I?"
 
     if has_visited[5] == True:
         if sus_array[5] == 0:
@@ -988,59 +1037,74 @@ label fairy_path:
     label .ask_questions:
         if sus_array[5] >= 3:
             show fairy angry
-            f "DONT talk to me."
+            f "Enough chatter. Make my drink already."
             return
-
-        f "ask me anything!!!."
+            
+        show fairy happy
+        f "Talk about myself? Sure <3 <3"
 
         label .questions:
             if sus_array[5] < 3:
                 menu:
-                    "What do you prefer in a drink?":
-                        show fairy happy
-                        f "MILKKKKKKKKKK MILK MILK MILK"
-                        jump .questions
-                    
-                    "Any dislikes?":
+                    "Interesting hair color!":
                         show fairy neutral
-                        f "nothing SOUR BLEGH"
-
-                        menu:
-                            "Anything else?":
-                                f "NOTHING with nuts, im allergic!!!!"
-                                jump .questions
-
-                            "Nevermind, I'm done asking questions.":
-                                return   
-
-                    "Why are you so beautiful?":
+                        f "I change it every week."
                         show fairy happy
-                        f "thank you"
+                        f "Last week's was green and yellow. Luckily, yellow is easy to dye over."
                         jump .questions     # let player ask more questions after branch end
 
-                    "Are you evil?":
+                    "What flavors do you like?":
+                        show fairy happy
+                        f "Rich drinks! I want milk or half and half or something."
+                        show fairy neutral
+                        f "You really can't go wring with liquors either..."
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Have any dietary restrictions?":
                         show fairy angry
-                        f "bro wtf"
+                        f "I have an... unusual metal allergy"
+                        show fairy neutral
+                        f "I’ve never really had any issues with it at bars though!"
+                        show fairy angry
+                        f "Some fruit actually has enough of it to make me sick, so be a sweetheart and avoid tropical drinks."
                         call .add_sus
+                        jump .questions     # let player ask more questions after branch end
 
-                        menu:
-                            "Yah cuz your face just looks evil":
-                                f ">:("
-                                call .add_sus
+                    "What do you do for a living?":
+                        show fairy neutral
+                        f "I'm a youtuber actually!"
+                        show fairy happy
+                        f "I run a prank channel."
+                        show fairy neutral
+                        f "Don't worry, I'm not truman show-ing you right now."
+                        show fairy happy
+                        f "Totally."
+                        jump .questions     # let player ask more questions after branch end
 
-                                menu:
-                                    "...are you a vampire":
-                                        f "..."
-                                        call .add_sus
-                                    "Nevermind, I'm done asking questions.":
-                                        return
-                                    
-                            "Nevermind, I'm done asking questions.":
-                                return    
+                    "You seem bored?":
+                        show fairy angry
+                        f "Not gonna lie, this club is kinda dead."
+                        show fairy happy
+                        f "I came here for nightlife! Action!! Parties!!!"
+                        show fairy neutral
+                        f "Whatever, if the drinks are good enough..."
+                        show fairy happy
+                        f "I can use my channel to really boost this place."
+                        jump .questions     # let player ask more questions after branch end
+
+                    "Can I have your real name?":
+                        show fairy angry
+                        f "...hm."
+                        show fairy happy
+                        f "Can I have yours?"
+                        b "Afraid not."
+                        show fairy angry
+                        f "Boo, don't be so boring."
+                        call .add_sus
+                        jump .questions     # let player ask more questions after branch end
 
                     "Nevermind, I'm done asking questions.":
-                        return                                    
-            return
+                        return    
 
         # helper function for halting questions if max sus reached
         label .add_sus():
@@ -1063,32 +1127,35 @@ label fairy_path:
         # drink result dialogue
         if drink_result == 3:
             show fairy angry
-            f "this seems goo- what have you done?"
-
+            f "WHAT- this is RANCID!!"
+            f "YOU TRYING TO KILL ME OR SOMETH-"
             call fade_scene
             $ char_choice_array.remove(5)
         else:
             if drink_result == 0:
-                show fairy neutral
-                f "whole drink is forgettable"
+                show fairy angry
+                f "Painfully average. I should’ve known better than to come to some no-name random bar like this"
             elif drink_result == 1:
                 show fairy happy
-                f "i like it, but its not memorable enough"
+                f "Painfully average. I should’ve known better than to come to some no-name random bar like this."
             elif drink_result == 2:
                 show fairy neutral
                 f "[ingredients[neutral_ingredient]]... is quite boring"
             elif drink_result == 4:
                 show fairy angry
-                f "both forgettable and mildy disgusting..."
+                f "Do you know me at all?? Boring and gross, what a miracle."
+                f "I’m not coming back here, ugh"
             else:
                 show fairy angry
-                f "this doesnt look good at all..."
+                f "…Okay so you’re messing with me, great."
+                f "Have a horrible night."
+                "Looks like she didn't want to drink it at all. Try to add something she would like to mask the drink."
 
             $ has_visited[5] = True
             $ lives_count -= 1
 
             # parting goodbye lines
-            f "Goodbye."
+            f "See you around. Or not!"
 
         hide fairy
 
@@ -1231,18 +1298,20 @@ label doppelganger_path:
     $ drink_result = 0      # initialize drink result
     show doppel neutral
     "Someone walks in, looking like... you?"
+    show doppel happy
+    d "hiii I like whatever you like babygirl <3"
 
     if has_visited[7] == True:
         if sus_array[7] == 0:
             show doppel happy talk
-            v "Hey, we've seen each other before!"
+            d "Hey, we've seen each other before!"
         else:
             show doppel neutral talk
-            v "We've seen each other before..."
+            d "We've seen each other before..."
 
         # logic for decreasing sus by 1 upon revisiting
         if sus_array[7] != 0:
-            v "...I might be open to talk a little again."
+            d "...I might be open to talk a little again."
             show doppel neutral
             "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
             $ sus_array[7] -= 1
@@ -1391,7 +1460,7 @@ label doppelganger_path:
 
         show doppel happy
         d "Hmm~~~~ Anything you make it delicious~"
-        "They take a sip from the drink."
+        "Yoru takes a sip from the drink."
         d "...Quite a funny taste."
         show doppel true form
         d "...I know what you're trying to do..."
@@ -1440,13 +1509,13 @@ label start:
 
     # calls character until no chars remain or you lost all your lives
     while char_choice_array and lives_count != 0:
-        call char_select 
+        call char_select
    
     # win/lose state
     if lives_count == 0:
-        "Lose state womp womp" # TO-DO: IMPLEMENT LOSE STATE
+        "You lost!! Next time, try to make something both tasty AND deadly." # TO-DO: IMPLEMENT LOSE STATE
     else:
-        "Everyone died nahhhhh" # TO-DO: IMPLEMENT WIN STATE     
+        "Hell yes. Now you can absorb their powers and become god. YOU WIN!!!" # TO-DO: IMPLEMENT WIN STATE     
 
 
 return
