@@ -6,12 +6,23 @@
 # to-do: add character name colors based on char design
 
 define b = Character("Bartender")
-define v = Character("Vampire")
+define v = Character("Victor")
+image vampire neutral = "images/Vampire/vampire_neutralclosed1.png"
+image vampire happy = "images/Vampire/vampire_happyclosed.png"
+image vampire angry = "images/Vampire/vampire_angryopen.png"
 define w = Character("Werewolf")
 define a = Character("Alien")
-define s = Character("Selkie")
+define s = Character("Shelly")
+image selkie neutral = "images/Selkie/selkie_neutral.png"
+image selkie happy = "images/Selkie/selkie_happy.png"
+image selkie angry = "images/Selkie/selkie_angry.png"
+image selkie shocked = "images/Selkie/selkie_shocked.png"
+image selkie true form = "images/Selkie/selkie_trueform.png"
 define g = Character("Ghost")
-define f = Character("Fairy")
+define f = Character("Ebony Dark'ness Dementia Raven Way")
+image fairy neutral = "images/Fairy/fairy_neutral.png"
+image fairy happy = "images/Fairy/fairy_happy.png"
+image fairy angry = "images/Fairy/fairy_angry.png"
 define m = Character("Medusa")
 define d = Character("Doppelganger")
 image doppel neutral = "images/Doppelganger/doppelganger_neutral.png"
@@ -39,6 +50,20 @@ define correct_drink = [
     [6, 16, 26], 
     [-1, -1, -1]
 ]
+
+image red_flash = Solid("#ff0000")
+
+label fade_scene:
+    show red_flash
+    with Dissolve(0.05)
+    
+    scene black
+    with Dissolve(2.0)
+
+    "Ah, what a shame. I will cherish that guest in my memories."
+
+    scene bg room
+    return
 
 # defines where liked ingredient pos is of each character in char_preferences
 # doppelganger is initially -1
@@ -151,21 +176,21 @@ label char_select:
 # dialogue path of vampire
 label vampire_path:
     $ drink_result = 0      # initialize drink result
-    show doppel neutral
+    show vampire neutral
     v "1"
 
     if has_visited[0] == True:
         if sus_array[0] == 0:
-            show doppel happy talk
+            show vampire happy
             v "Hey, we've seen each other before!"
         else:
-            show doppel neutral talk
+            show vampire neutral
             v "We've seen each other before..."
 
         # logic for decreasing sus by 1 upon revisiting
         if sus_array[0] != 0:
             v "...I might be open to talk a little again."
-            show doppel neutral
+            show vampire neutral
             "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
             $ sus_array[0] -= 1
 
@@ -196,7 +221,7 @@ label vampire_path:
     # where you ask questions
     label .ask_questions:
         if sus_array[0] >= 3:
-            show doppel angry talk
+            show vampire angry
             v "I do not want to talk anymore."
             return
 
@@ -205,16 +230,31 @@ label vampire_path:
         label .questions:
             if sus_array[0] < 3:
                 menu:
+                    "What do you prefer in a drink?":
+                        show vampire happy
+                        v "Something strong, but keep it more refined."
+                        jump .questions
+                    
+                    "Any dislikes?":
+                        show vampire neutral
+                        v "I hate the smell of italian restaurants the most."
+
+                        menu:
+                            "Anything else?":
+                                v "I wouldn't really call myself a vegan. Best believe I only desire the most ...\"authentic\" sources."
+                                jump .questions
+
+                            "Nevermind, I'm done asking questions.":
+                                return 
+
                     "Why are you so beautiful?":
-                        show doppel happy talk
+                        show vampire happy
                         v "thank you"
-                        show doppel happy
                         jump .questions     # let player ask more questions after branch end
 
                     "Are you evil?":
-                        show doppel angry talk
+                        show vampire angry
                         v "bro wtf"
-                        show doppel angry
                         call .add_sus
 
                         menu:
@@ -249,7 +289,7 @@ label vampire_path:
     # after serve drink
 
     label .after_drink:
-        show doppel neutral
+        show vampire neutral
         "You hand the drink to the guest."
         $ set_drink_result_variables(served_drink, correct_drink[0], 0)
 
@@ -264,18 +304,25 @@ label vampire_path:
         # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
         # drink result dialogue
         if drink_result == 3:
+            show vampire angry
             v "this seems goo- what have you done?"
             $ char_choice_array.remove(0)
+            call fade_scene
         else:
             if drink_result == 0:
+                show vampire neutral
                 v "whole drink is forgettable"
             elif drink_result == 1:
+                show vampire happy
                 v "i like it, but its not memorable enough"
             elif drink_result == 2:
+                show vampire neutral
                 v "[ingredients[neutral_ingredient]]... is quite boring"
             elif drink_result == 4:
+                show vampire angry
                 v "both forgettable and mildy disgusting..."
             else:
+                show vampire angry
                 v "this doesnt look good at all..."
 
             $ has_visited[0] = True
@@ -284,7 +331,7 @@ label vampire_path:
             # parting goodbye lines
             v "Goodbye."
 
-        hide doppel
+        hide vampire
 
     return  
 
@@ -555,21 +602,21 @@ label alien_path:
 # dialogue path of selkie
 label selkie_path:
     $ drink_result = 0      # initialize drink result
-    show vamp unhappy
-    v "4" 
+    show selkie neutral
+    s "...hello..."
 
     if has_visited[3] == True:
         if sus_array[3] == 0:
-            show doppel happy talk
-            v "Hey, we've seen each other before!"
+            show selkie happy
+            s "Hey, we've seen each other before!"
         else:
-            show doppel neutral talk
-            v "We've seen each other before..."
+            show selkie neutral
+            s "We've seen each other before..."
 
         # logic for decreasing sus by 1 upon revisiting
         if sus_array[3] != 0:
-            v "...I might be open to talk a little again."
-            show doppel neutral
+            s "...I might be open to talk a little again."
+            show selkie neutral
             "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
             $ sus_array[3] -= 1
 
@@ -600,35 +647,33 @@ label selkie_path:
     # where you ask questions
     label .ask_questions:
         if sus_array[3] >= 3:
-            show doppel angry talk
-            v "I do not want to talk anymore."
+            show selkie angry
+            s "I do not want to talk anymore."
             return
 
-        v "Ask away."
+        s "Ask away."
 
         label .questions:
             if sus_array[3] < 3:
                 menu:
                     "Why are you so beautiful?":
-                        show doppel happy talk
-                        v "thank you"
-                        show doppel happy
+                        show selkie happy
+                        s "thank you"
                         jump .questions     # let player ask more questions after branch end
 
                     "Are you evil?":
-                        show doppel angry talk
-                        v "bro wtf"
-                        show doppel angry
+                        show selkie angry
+                        s "bro wtf"
                         call .add_sus
 
                         menu:
                             "Yah cuz your face just looks evil":
-                                v ">:("
+                                s ">:("
                                 call .add_sus
 
                                 menu:
                                     "...are you a vampire":
-                                        v "..."
+                                        s "..."
                                         call .add_sus
                                     "Nevermind, I'm done asking questions.":
                                         return
@@ -653,34 +698,37 @@ label selkie_path:
     # after serve drink
 
     label .after_drink:
-        show doppel neutral
+        show selkie neutral
         "You hand the drink to the guest."
         $ set_drink_result_variables(served_drink, correct_drink[3], 3)
 
         # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
         # drink result dialogue
         if drink_result == 3:
-            v "this seems goo- what have you done?"
+            show selkie shocked
+            s "this seems goo- what have you done?"
+            show selkie true from
+            s "NOOOOOOOOO"
             $ char_choice_array.remove(3)
         else:
             if drink_result == 0:
-                v "whole drink is forgettable"
+                s "whole drink is forgettable"
             elif drink_result == 1:
-                v "i like it, but its not memorable enough"
+                s "i like it, but its not memorable enough"
             elif drink_result == 2:
-                v "[ingredients[neutral_ingredient]]... is quite boring"
+                s "[ingredients[neutral_ingredient]]... is quite boring"
             elif drink_result == 4:
-                v "both forgettable and mildy disgusting..."
+                s "both forgettable and mildy disgusting..."
             else:
-                v "this doesnt look good at all..."
+                s "this doesnt look good at all..."
 
             $ has_visited[3] = True
             $ lives_count -= 1
 
             # parting goodbye lines
-            v "Goodbye."
+            s "Goodbye."
 
-        hide doppel
+        hide selkie
 
     return  
 
@@ -819,21 +867,21 @@ label ghost_path:
 # dialogue path of fairy
 label fairy_path:
     $ drink_result = 0      # initialize drink result
-    show vamp unhappy
-    v "6"  
+    show fairy neutral
+    f "Hi, I'm Ebony Dark'ness Dementia Raven Way!!!!!"  
 
     if has_visited[5] == True:
         if sus_array[5] == 0:
-            show doppel happy talk
-            v "Hey, we've seen each other before!"
+            show fairy happy
+            f "Hey, we've seen each other before!"
         else:
-            show doppel neutral talk
-            v "We've seen each other before..."
+            show fairy neutral
+            f "We've seen each other before..."
 
         # logic for decreasing sus by 1 upon revisiting
         if sus_array[5] != 0:
-            v "...I might be open to talk a little again."
-            show doppel neutral
+            f "...I might be open to talk a little again."
+            show fairy neutral
             "It seems their suspicion has slightly cooled. You can ask them more questions, if you're careful enough."
             $ sus_array[5] -= 1
 
@@ -864,8 +912,8 @@ label fairy_path:
     # where you ask questions
     label .ask_questions:
         if sus_array[5] >= 3:
-            show doppel angry talk
-            v "I do not want to talk anymore."
+            show fairy angry
+            f "I do not want to talk anymore."
             return
 
         v "Ask away."
@@ -874,25 +922,23 @@ label fairy_path:
             if sus_array[5] < 3:
                 menu:
                     "Why are you so beautiful?":
-                        show doppel happy talk
-                        v "thank you"
-                        show doppel happy
+                        show fairy happy
+                        f "thank you"
                         jump .questions     # let player ask more questions after branch end
 
                     "Are you evil?":
-                        show doppel angry talk
-                        v "bro wtf"
-                        show doppel angry
+                        show fairy angry
+                        f "bro wtf"
                         call .add_sus
 
                         menu:
                             "Yah cuz your face just looks evil":
-                                v ">:("
+                                f ">:("
                                 call .add_sus
 
                                 menu:
                                     "...are you a vampire":
-                                        v "..."
+                                        f "..."
                                         call .add_sus
                                     "Nevermind, I'm done asking questions.":
                                         return
@@ -917,34 +963,40 @@ label fairy_path:
     # after serve drink
 
     label .after_drink:
-        show doppel neutral
+        show fairy neutral
         "You hand the drink to the guest."
         $ set_drink_result_variables(served_drink, correct_drink[5], 5)
 
         # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
         # drink result dialogue
         if drink_result == 3:
-            v "this seems goo- what have you done?"
+            show fairy shocked
+            f "this seems goo- what have you done?"
             $ char_choice_array.remove(5)
         else:
             if drink_result == 0:
-                v "whole drink is forgettable"
+                show fairy neutral
+                f "whole drink is forgettable"
             elif drink_result == 1:
-                v "i like it, but its not memorable enough"
+                show fairy happy
+                f "i like it, but its not memorable enough"
             elif drink_result == 2:
-                v "[ingredients[neutral_ingredient]]... is quite boring"
+                show fairy neutral
+                f "[ingredients[neutral_ingredient]]... is quite boring"
             elif drink_result == 4:
-                v "both forgettable and mildy disgusting..."
+                show fairy angry
+                f "both forgettable and mildy disgusting..."
             else:
-                v "this doesnt look good at all..."
+                show fairy angry
+                f "this doesnt look good at all..."
 
             $ has_visited[5] = True
             $ lives_count -= 1
 
             # parting goodbye lines
-            v "Goodbye."
+            f "Goodbye."
 
-        hide doppel
+        hide fairy
 
     return 
 
@@ -1225,7 +1277,7 @@ label start:
     #start the bg music
     play music "relaxing-jazz-music-loop.mp3"
 
-
+    call vampire_path
 
     # calls character until no chars remain or you lost all your lives
     while char_choice_array and lives_count != 0:
