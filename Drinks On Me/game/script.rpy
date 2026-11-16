@@ -1222,6 +1222,8 @@ label start:
     # images directory to show it.
 
     scene bg room
+    #start the bg music
+    play music "relaxing-jazz-music-loop.mp3"
 
 
 
