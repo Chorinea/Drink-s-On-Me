@@ -37,7 +37,7 @@ define ingredient_descriptions = [
     "Bourbon: A full-bodied whiskey with a sweet, vanilla flavor.",
     "Blue Curacao: Deep blue liqueur with a hint of orange flavor. Great for a tropical feel.",
     "Sake: A Japanese rice wine with a delicate, subtle flavor.",
-    "Amaretto: Nutty and creamy flavor. Sourced from almonds. Lots of almonds.",
+    "Amaretto: Nutty and creamy flavor. Sourced from almonds. Lots of almonds. Iron content through the roof.",
     "Wine: Not aged very long. Quite tacky and cheap flavor profile.",
     "Gin: A botanical spirit with a distinctive juniper flavor.",
     "Tequila: Great for shots! Shots! Shots! But also good for mixing.",
