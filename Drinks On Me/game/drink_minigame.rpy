@@ -1,14 +1,15 @@
-image ing_0_img = Solid("#2a3a45", xsize=160, ysize=200)
-image ing_1_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_2_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_3_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_4_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_5_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_6_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_7_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_8_img = Solid("#aaddff", xsize=160, ysize=200)
-image ing_9_img = Solid("#aaddff", xsize=160, ysize=200) 
-image ing_10_img = Solid("#214156", xsize=160, ysize=200)
+image ing_0_img = "images/Ingredients/Bases/vodka_.png"
+image ing_1_img = "images/Ingredients/Bases/whiskey_.png"
+image ing_2_img = "images/Ingredients/Bases/bourbon_.png"
+image ing_3_img = "images/Ingredients/Bases/bluecuracao_.png" 
+image ing_4_img = "images/Ingredients/Bases/sake_.png"
+image ing_5_img = "images/Ingredients/Bases/amaretto_.png"
+image ing_6_img = "images/Ingredients/Bases/wine_.png"
+image ing_7_img = "images/Ingredients/Bases/gin_.png"
+image ing_8_img = "images/Ingredients/Bases/tequila_.png"
+image ing_9_img = "images/Ingredients/Bases/brandy_.png"
+image ing_10_img = "images/Ingredients/Bases/tomato_.png"
+image ing_11_img = Solid("#aaddff", xsize=160, ysize=200) 
 image ing_11_img = Solid("#aaddff", xsize=160, ysize=200) 
 image ing_12_img = Solid("#aaddff", xsize=160, ysize=200)
 image ing_13_img = Solid("#aaddff", xsize=160, ysize=200) 
@@ -104,10 +105,10 @@ screen minigame_screen():
                 null width 160 height 200
             else:
                 imagebutton:
-                    idle "ing_%d_img" % item
+                    idle Transform("ing_%d_img" % item, fit="scale-down", xysize=(160, 200))
                     xpos 0
                     ypos 10
-                    hover Transform("ing_%d_img" % item, zoom=1.1)
+                    hover Transform("ing_%d_img" % item, fit="scale-down", xysize=(160, 200), zoom=1.1)
 
                     sensitive len(selected_ingredients) < 3     # can only click if ingredients not fully selected yet
 
@@ -127,10 +128,10 @@ screen minigame_screen():
                 null width 160 height 200
             else:
                 imagebutton:
-                    idle "ing_%d_img" % item
+                    idle Transform("ing_%d_img" % item, fit="scale-down", xysize=(160, 200))
                     xpos 0
                     ypos 50
-                    hover Transform("ing_%d_img" % item, zoom=1.1)
+                    hover Transform("ing_%d_img" % item, fit="scale-down", xysize=(160, 200), zoom=1.1)
 
                     sensitive len(selected_ingredients) < 3     # can only click if ingredients not fully selected yet
 
@@ -149,10 +150,10 @@ screen minigame_screen():
                 null width 160 height 200
             else:
                 imagebutton:
-                    idle "ing_%d_img" % item
+                    idle Transform("ing_%d_img" % item, fit="scale-down", xysize=(160, 200)) 
                     xpos 0
                     ypos 100
-                    hover Transform("ing_%d_img" % item, zoom=1.1)
+                    hover Transform("ing_%d_img" % item, fit="scale-down", xysize=(160, 200), zoom=1.1)
 
                     sensitive len(selected_ingredients) < 3     # can only click if ingredients not fully selected yet
 
@@ -194,7 +195,7 @@ screen minigame_screen():
                     fixed:
                         xsize 160 ysize 200
 
-                        add "ing_[item]_img" xalign 0.5 yalign 0.5
+                        add Transform("ing_%d_img" % item, fit="scale-down", xysize=(160, 200))
                         
                         if hovered_box_index == i:
                             text "X" size 40 color "#ff0000" xalign 0.5 yalign 0.5
