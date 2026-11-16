@@ -699,9 +699,7 @@ label selkie_path:
                         s "Books are so cool... it sucks that they have to be kept somewhere dry- I mean um. That they take up so much space!"
 
                         
-                        jump .questions     # let player ask more questions after branch end     
-                        "Nevermind, I'm done asking questions.":
-                            return    
+                        jump .questions     # let player ask more questions after branch end      
 
                     "Nevermind, I'm done asking questions.":
                         return                                    
@@ -938,7 +936,7 @@ label fairy_path:
             f "I do not want to talk anymore."
             return
 
-        v "Ask away."
+        f "Ask away."
 
         label .questions:
             if sus_array[5] < 3:
@@ -1356,8 +1354,6 @@ label start:
     scene bg room
     #start the bg music
     play music "relaxing-jazz-music-loop.mp3"
-
-    call vampire_path
 
     # calls character until no chars remain or you lost all your lives
     while char_choice_array and lives_count != 0:
