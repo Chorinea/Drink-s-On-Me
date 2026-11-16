@@ -567,24 +567,24 @@ label alien_path:
                 menu:
                     "Why are you so beautiful?":
                         show doppel happy talk
-                        v "thank you"
+                        w "thank you"
                         show doppel happy
                         jump .questions     # let player ask more questions after branch end
 
                     "Are you evil?":
                         show doppel angry talk
-                        v "bro wtf"
+                        w "bro wtf"
                         show doppel angry
                         call .add_sus
 
                         menu:
                             "Yah cuz your face just looks evil":
-                                v ">:("
+                                w ">:("
                                 call .add_sus
 
                                 menu:
                                     "...are you a vampire":
-                                        v "..."
+                                        w "..."
                                         call .add_sus
                                     "Nevermind, I'm done asking questions.":
                                         return
@@ -991,23 +991,23 @@ label fairy_path:
             f "DONT talk to me."
             return
 
-        v "Ask away."
+        f "ask me anything!!!."
 
         label .questions:
             if sus_array[5] < 3:
                 menu:
                     "What do you prefer in a drink?":
                         show fairy happy
-                        v "MILKKKKKKKKKK MILK MILK MILK"
+                        f "MILKKKKKKKKKK MILK MILK MILK"
                         jump .questions
                     
                     "Any dislikes?":
                         show fairy neutral
-                        v "nothing SOUR BLEGH"
+                        f "nothing SOUR BLEGH"
 
                         menu:
                             "Anything else?":
-                                v "NOTHING with nuts, im allergic!!!!"
+                                f "NOTHING with nuts, im allergic!!!!"
                                 jump .questions
 
                             "Nevermind, I'm done asking questions.":
