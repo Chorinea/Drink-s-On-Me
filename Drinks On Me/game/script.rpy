@@ -1353,30 +1353,40 @@ label doppelganger_path:
     label .after_drink:
         show doppel neutral
         "You hand the drink to the guest."
-        $ set_drink_result_variables(served_drink, correct_drink[7], 7)
+        show doppel happy
+        d "Hmm~~~~ Anything you make it delicious~"
+        "They take a sip from the drink."
+        d "...Quite a funny taste."
+        show doppel true form
+        d "...I know what you're trying to do..."
+        d "...Please, do with me what you have planned. I would love to see how this unfolds."
+        call fade_scene
+        $ char_choice_array.remove(7)        
 
-        # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
-        # drink result dialogue
-        if drink_result == 3:
-            v "this seems goo- what have you done?"
-            $ char_choice_array.remove(7)
-        else:
-            if drink_result == 0:
-                v "whole drink is forgettable"
-            elif drink_result == 1:
-                v "i like it, but its not memorable enough"
-            elif drink_result == 2:
-                v "[ingredients[neutral_ingredient]]... is quite boring"
-            elif drink_result == 4:
-                v "both forgettable and mildy disgusting..."
-            else:
-                v "this doesnt look good at all..."
+        # $ set_drink_result_variables(served_drink, correct_drink[7], 7)
 
-            $ has_visited[7] = True
-            $ lives_count -= 1
+        # # TO-DO: IMPLEMENT SPECIFIC DIALOGUE FOR PERSONALITY
+        # # drink result dialogue
+        # if drink_result == 3:
+        #     v "this seems goo- what have you done?"
+        #     $ char_choice_array.remove(7)
+        # else:
+        #     if drink_result == 0:
+        #         v "whole drink is forgettable"
+        #     elif drink_result == 1:
+        #         v "i like it, but its not memorable enough"
+        #     elif drink_result == 2:
+        #         v "[ingredients[neutral_ingredient]]... is quite boring"
+        #     elif drink_result == 4:
+        #         v "both forgettable and mildy disgusting..."
+        #     else:
+        #         v "this doesnt look good at all..."
 
-            # parting goodbye lines
-            v "Goodbye."
+        #     $ has_visited[7] = True
+        #     $ lives_count -= 1
+
+        #     # parting goodbye lines
+        #     v "Goodbye."
 
         hide doppel
 
