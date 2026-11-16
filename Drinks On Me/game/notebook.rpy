@@ -63,10 +63,18 @@ define character_facts = [ #displays the facts found for each question asked
 #define config.detached_layers += ["profile"]
 #image profile = Window(Layer("profile"), etc)
 init python:
-    def set_ingredients_known(drink_array, correct_drink_array,char_num):
+    def set_ingredients_known(correct_drink_array,char_num):
+        
+        character_reciepe = []
+        while ingredient_num > 3:
+            #gets the ingredient number from the array from the right character
+            ingredient_num = correct_drink_array[[char_num]]
+            
+        
+        
         ingredient_pos = [0,1,2]
 
-        
+
 
         # add dislikes to array
         liked_ingredient = correct_drink_array[likes_pos[char_num]]

@@ -1181,43 +1181,101 @@ label doppelganger_path:
     label .ask_questions:
         if sus_array[7] >= 3:
             show doppel angry talk
-            v "I do not want to talk anymore."
+            d "Okay that's enough, you're just being a meanie! I don't want to answer any more of your questions."
+            b "Look I'm not trying to-"
+            d "I don't wanna hear it! Do you talk to everyone else like this?"
+            b "Well-"
+            d "Me wanna drink now!"
+            show doppel angry
             return
 
-        v "Ask away."
+        d "Ask away."
 
         label .questions:
             if sus_array[7] < 3:
                 menu:
-                    "Why are you so beautiful?":
+                    "I think you got something on your face?":
+                        call .add_sus
                         show doppel happy talk
-                        v "thank you"
+                        d "Wahh!! Really? Oh my god that's so embarrassing, what is it?"
+                        menu:
+                            "It kinda looks like a slice of cheese?":
+                                d "Ohh that, silly bartender I obvioiusly know about that."
+                                b "Well why is it there then?"
+                                d "I'm saving it as a snack for later!"
+                                b "A snack...?"
+                                d "Yeah, I might even have it with my drink!"
+                            "It's the sticky note that's covering literally your whole face!":
+                                call .add_sus
+                                d "W-What are you talking about, this is just how I look!"
+                                b "You have a whole sticky note just ccovering your face! How can you even see me right now?"
+                                d "Wahhh... you're just making fun of me..."
+                                b "Okay okay I'm sorry, I'll just drop it!"
+                                d "..."
+                                b "L-Look the drinks on me, okay?"
+                                d "Really! You'd do that for me?"
+                            "Alright let's just move on from this...":
+                                return
                         show doppel happy
                         jump .questions     # let player ask more questions after branch end
 
-                    "Are you evil?":
+                    "What kind of flavor profile are you looking for?":
                         show doppel angry talk
-                        v "bro wtf"
+                        d "Oh you know, a little of this, a little of that."
+                        b "Okay but if you had to pic one main flavor what would it be?"
+                        d "Look I don't know, I'm just a little guy who's had a long day! How about a drink you {b}haven't served anyone else.{/b}"
                         show doppel angry
+                
+                    "So how long have you been working here?":
                         call .add_sus
+                        d "Uhh, I'm not sure. I haven't bothered to keep track, we're more than just our jobs you know?"
+                        b "Fair enough, I'm ust surprised we haven't met before this. Not that many people are staffed here."
+                        d "C-Crazy, we must have just barely missed each other!"
+                        b "Yeah that's probably it, what hours do you usually work?"
+                        d "I don't know...?"
+                        b "You don't know what time you work?"
+                        d "No, I mean..."
+                        d "l-like my schedule is just pretty random. I'll just pick up shifts here and there so it kinda looks different each week."
+                        b "Uh huh..."
 
+                    "Do you take it dry or wet?":
+                        d "Ohhh you know I could take it either way, I'm not too picky about how it goes down~"
+                        b "I'm tlaing about drinks."
+                        d "..."
+                        b "..."
+                        d "T-That's totally what I meant!"
+                        b "I can only take your word for it..."
+
+                    "Let me guess you like your drinks sweet?":
+                        d "Aww are you just saying that because you think I'm sweet?"
                         menu:
-                            "Yah cuz your face just looks evil":
-                                v ">:("
+                            "You could say that.":
+                                d "Bartender! You're making me blush~"
+                                b "I like to consider myself a smooth talker."
+                                d "I'll be honest I don't have strong opinions on sugary drinks."
+                                b "Could you give me a hint?"
+                                d "Hmm, well how about this?"
+                                d "I'll take the {b}favorite{/b} drink of my {b}favorite{/b} bartender."
+                            "Nah, sweet cocktails are just pretty popular.":
                                 call .add_sus
+                                d "Oh... well are you sure both can't be true?"
+                                b "I mean I guess, but I don't really know you."
+                                d "Bartender you're so cold!"
+                                b "Okay, well tell me something about yourself."
+                                d "...Pass."
+                            "Gotcha loud and clear.":
+                                return 
 
-                                menu:
-                                    "...are you a vampire":
-                                        v "..."
-                                        call .add_sus
-                                    "Nevermind, I'm done asking questions.":
-                                        return
-                                    
-                            "Nevermind, I'm done asking questions.":
-                                return    
-
+                    "Are you looking to get drunk or just have something nice to sip on?":
+                        d "Well I don't see why both aren't possible."
+                        b "Huh... I only ever thought about it as one or the other to be honest."
+                        d "I just have a hard time making choices for myself! There's so many options to choose from..."
+                        b "So why'd you decide to walk into the bar then?"
+                        d "I want a drink only {b}only{/b} you would make."
+                        b "Geez that's a lot of pressure."
+                        d "I know you can do it"
                     "Nevermind, I'm done asking questions.":
-                        return                                    
+                        return                                   
             return
 
         # helper function for halting questions if max sus reached
