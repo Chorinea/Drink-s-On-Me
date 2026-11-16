@@ -10,7 +10,7 @@ define v = Character("Victor")
 image vampire neutral = "images/Vampire/vampire_neutralclosed1.png"
 image vampire happy = "images/Vampire/vampire_happyclosed.png"
 image vampire angry = "images/Vampire/vampire_angryopen.png"
-define w = Character("Werewolf")
+define w = Character("Jakob")
 define a = Character("Alien")
 define s = Character("Shelly")
 image selkie neutral = "images/Selkie/selkie_neutral.png"
@@ -24,7 +24,7 @@ image fairy neutral = "images/Fairy/fairy_neutral.png"
 image fairy happy = "images/Fairy/fairy_happy.png"
 image fairy angry = "images/Fairy/fairy_angry.png"
 define m = Character("Medusa")
-define d = Character("Doppelganger")
+define d = Character("Yoru Nanami")
 image doppel neutral = "images/Doppelganger/doppelganger_neutral.png"
 image doppel neutral talk = "images/Doppelganger/doppelganger_neutral_open.png"
 image doppel happy = "images/Doppelganger/doppelganger_happy.png"
@@ -648,7 +648,7 @@ label selkie_path:
     label .ask_questions:
         if sus_array[3] >= 3:
             show selkie angry
-            s "I do not want to talk anymore."
+            s "“Um. I don’t mean to be rude but. Since this is a bar and all… Can you just like, make me a drink now?"
             return
 
         s "Ask away."
@@ -656,30 +656,52 @@ label selkie_path:
         label .questions:
             if sus_array[3] < 3:
                 menu:
-                    "Why are you so beautiful?":
-                        show selkie happy
-                        s "thank you"
-                        jump .questions     # let player ask more questions after branch end
-
-                    "Are you evil?":
-                        show selkie angry
-                        s "bro wtf"
+                    "Nice sweater!":
                         call .add_sus
+                        show selkie neutral
+                        s "Thank you! People always say I-I mean it, is wife material haha."
+                        s "..."
+                        b "..."
+                        s "Like...as a joke..."
+                        s "Because it's so... warm?"
+                        s "Um."
+                        s "This is a bar. Can I get my drink soon?"
+                    "Do you have a flavor profile in mind?":
+                        show selkie neutral
+                        s "Hmmm... I like warm flavors, and beachy vibes."
+                        s "Like a cosy book you can't put down."
+                        s "Spices are hard to come by, so I also really enjoy those."
+                    "Do you have a favorite color?":
+                        s "Easy. Blue."
+                        s "It just feels like home..."
+                    "Any flavors I should avoid?":
+                        call .add_sus
+                        show selkie angry
+                        s "Um... I don't like man-made artifical stuff I guess?"
+                        b "...?"
+                        s "Oh, that sounds strange! I just mean uh,"
+                        show selkie neutral
+                        s "Anything is fine! I don't have a preference!"
+                        b "I see..."
+                    "Read any good books lately?":
+                        show selkie happy
+                        s "Yes! I just came from the library actually."
+                        s "I love romantasy! I just can't get enough of it."
+                        s "Though I will say... having the female lead be the monster is shocklingly difficult to find."
+                        s "I'm really into Kiera Cass' stuff, even if it's a bit older."
+                        s "*squints* and not... 100% the same, just close..."
+                        s "Ah, sorry, I'm talking too much huh."
+                    "How was the traffic today":
+                        call .add_sus
+                        show selkie angry
+                        s "Oh um, I couldn't tell you. I walked."
+                        s "I don't come into the city super often, mostly just to visit the library."
+                        s "Books are so cool... it sucks that they have to be kept somewhere dry- I mean um. That they take up so much space!"
 
-                        menu:
-                            "Yah cuz your face just looks evil":
-                                s ">:("
-                                call .add_sus
-
-                                menu:
-                                    "...are you a vampire":
-                                        s "..."
-                                        call .add_sus
-                                    "Nevermind, I'm done asking questions.":
-                                        return
-                                    
-                            "Nevermind, I'm done asking questions.":
-                                return    
+                        
+                        jump .questions     # let player ask more questions after branch end     
+                        "Nevermind, I'm done asking questions.":
+                            return    
 
                     "Nevermind, I'm done asking questions.":
                         return                                    
